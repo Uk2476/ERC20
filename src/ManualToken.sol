@@ -1,6 +1,8 @@
 //SPDX-License-Identifier:MIT
 pragma solidity ^0.8.18;
 
+error insufficientBalance();
+
 contract ManualToken{
 
     mapping (address=>uint256) accountBalance  ;
@@ -15,7 +17,15 @@ contract ManualToken{
         return 18;
     }
 
-    function balance(address memory accountAddress) public view returns(uint256){
+    function balance(address memory _accountAddress) public view returns(uint256){
+        return accountBalance[accountAddress];
+    }
 
+    function transfer(address memory _reciever , uint256 _amountToSend) public {
+        uint256 memory totalBalanceofTheseTwo = balance(_reciever)+balance(msg.sender);
+        require(accountBalance[msg.sender]>_amountToSend , insufficientBalance());
+        accountBalance[msg.sender]-=_amountToSend;
+        accountBalance[_reciever]+=_amountToSend;
+        require((balance(_reciever)+balance(msg.sender))== totalBalanceofTheseTwo, invalidtransaction());
     }
 }
